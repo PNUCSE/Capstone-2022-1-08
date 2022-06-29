@@ -49,8 +49,17 @@ def fn_craw(stock_code='005930'):
 
     url = f"https://finance.naver.com/item/main.naver?code={gcode}"
     table_list = pd.read_html(url, encoding='euc-kr')
+
     print(table_list)
+
     return "hi"
+# 전일 대비 등락률
+@app.route('/up_down/<co>')
+def up_down(co):
+    url = f"https://finance.naver.com/item/main.naver?code={co}"
+    table_list = pd.read_html(url, encoding='euc-kr')
+    js = table_list[4].iloc[1:3, [1]].to_json(orient='split', force_ascii=False)
+    return js
 @app.route('/info/<co>')
 def chart(co):
     print(co)

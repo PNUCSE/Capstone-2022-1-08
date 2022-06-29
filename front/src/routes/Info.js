@@ -26,6 +26,7 @@ const Header = styled.header`
 
 const Overview = styled.div`
   display: flex;
+  align-items: center;
   justify-content: space-between;
   background-color: rgba(0, 0, 0, 0.5);
   padding: 10px 20px;
@@ -52,6 +53,7 @@ function Info() {
   console.log(name);
   const [loading, setLoading] = useState(true);
   const [stockData, setstockData] = useState([{}]); //날짜별 가격
+  const [updown, setUpdown] = useState([[]]);
   const [relate, setRelate] = useState([]);
   useEffect(() => {
     // 종목 가격 불러오기 1.날짜 2.시가 3.고가 4.저가 5.종가
@@ -66,24 +68,51 @@ function Info() {
       const response = await fetch("/relate");
       const json = await response.json();
       setRelate(json.codes.slice(1));
+      const updownResponse = await fetch(`/up_down/${stockId}`);
+      const updownJson = await updownResponse.json();
+      setUpdown(updownJson.data);
       setLoading(false);
     })();
   }, []);
   console.log(relate);
   console.log(stockData);
+  // const isUp = updown[0][0].substr(0, 3);
+  // console.log(isUp);
   return (
     <Container>
       <Header>
-        <Title>
-          {stockId}
-          {name}
-        </Title>
+        <Title>{name}</Title>
       </Header>
       {loading ? (
         <Loader>loading...</Loader>
       ) : (
         <>
-          현재가: {stockData[stockData.length - 1].종가}
+          <Overview>
+            <OverviewItem>
+              <span>종목코드:</span>
+              <span>{stockId}</span>
+            </OverviewItem>
+            <OverviewItem>
+              <span>현재가:</span>
+              {/* 최신날짜 종가 */}
+              <span>{stockData[stockData.length - 1].종가}</span>
+              <span>
+                {updown[0][0].substr(0, 2) === "상향" ? (
+                  <p style={{ color: "red" }}> +{updown[0][0].substr(3)}</p>
+                ) : (
+                  <p style={{ color: "blue" }}> -{updown[0][0].substr(3)}</p>
+                )}
+              </span>
+              <span>
+                {updown[0][0].substr(0, 2) === "상향" ? (
+                  <p style={{ color: "red" }}> {updown[1][0].substr(3)}</p>
+                ) : (
+                  <p style={{ color: "blue" }}> {updown[1][0].substr(3)}</p>
+                )}
+              </span>
+            </OverviewItem>
+          </Overview>
+
           {stockData?.map((item) => (
             <h1>
               {item.날짜} {item.시가} {item.고가} {item.저가} {item.종가}{" "}
