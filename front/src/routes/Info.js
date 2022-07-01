@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import styled from "styled-components";
+import ApexChart from "react-apexcharts";
 const Container = styled.div`
   padding: 0px 20px;
-  max-width: 500px;
+  max-width: 1000px;
   margin: 0 auto;
 `;
 
@@ -113,12 +114,44 @@ function Info() {
             </OverviewItem>
           </Overview>
 
-          {stockData?.map((item) => (
-            <h1>
-              {item.날짜} {item.시가} {item.고가} {item.저가} {item.종가}{" "}
-              {item.거래량}
-            </h1>
-          ))}
+          <div>
+            <ApexChart
+              type="line"
+              series={[
+                {
+                  name: "sales",
+                  data: stockData?.map((price) => price.종가),
+                },
+              ]}
+              options={{
+                theme: {
+                  mode: "dark",
+                },
+                chart: {
+                  toolbar: {
+                    show: false,
+                  },
+                  height: 500,
+                },
+                grid: {
+                  show: true,
+                },
+                stroke: {
+                  curve: "smooth",
+                  width: 3,
+                },
+                xaxis: {
+                  type: "datetime",
+                  categories: stockData?.map((price) => price.날짜),
+                  labels: {
+                    style: {
+                      colors: "#9c88ff",
+                    },
+                  },
+                },
+              }}
+            />
+          </div>
         </>
       )}
     </Container>
