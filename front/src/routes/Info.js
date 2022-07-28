@@ -1,7 +1,17 @@
 import { useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  useLocation,
+  useParams,
+  Outlet,
+  Link,
+  useMatch,
+} from "react-router-dom";
 import styled from "styled-components";
 import ApexChart from "react-apexcharts";
+import Finance from "./Finance";
+import Article from "./Article";
 const Container = styled.div`
   padding: 0px 20px;
   max-width: 1000px;
@@ -44,25 +54,49 @@ const OverviewItem = styled.div`
     margin-bottom: 5px;
   }
 `;
+const Tabs = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  margin: 25px 0px;
+  gap: 10px;
+`;
+
+const Tab = styled.span`
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 400;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 7px 0px;
+  border-radius: 10px;
+  color: ${(props) =>
+    props.isActive ? props.theme.accentColor : props.theme.textColor};
+  a {
+    display: block;
+  }
+`;
+
 const Description = styled.p`
   margin: 20px 0px;
 `;
 function Info() {
   const { stockId } = useParams();
   const { state } = useLocation();
+  console.log(useLocation());
   const name = state.name;
-  console.log(name);
   const [loading, setLoading] = useState(true);
   const [stockData, setstockData] = useState([{}]); //날짜별 가격
   const [updown, setUpdown] = useState([[]]);
   const [relate, setRelate] = useState([]);
+  const articleMatch = useMatch("/:stockId/article");
+  const financeMatch = useMatch("/:stockId/finance");
+
   useEffect(() => {
     // 종목 가격 불러오기 1.날짜 2.시가 3.고가 4.저가 5.종가
     fetch(`/info/${stockId}`)
       .then((res) => res.json())
       .then((data) => {
         setstockData(data.data);
-        console.log(data.data[0].날짜);
       });
     // 연관기업코드
     (async () => {
@@ -152,6 +186,19 @@ function Info() {
               }}
             />
           </div>
+          <Tabs>
+            <Tab isActive={financeMatch !== null}>
+              <Link to="finance" state={{ name }}>
+                finance
+              </Link>
+            </Tab>
+            <Tab isActive={articleMatch !== null}>
+              <Link to="article" state={{ name }}>
+                Article
+              </Link>
+            </Tab>
+          </Tabs>
+          <Outlet />
         </>
       )}
     </Container>

@@ -7,6 +7,7 @@ from time import sleep
 import time
 import pandas as pd
 from pykrx import stock
+import json
 import numpy as np
 app = Flask(__name__)
 today=datetime.today().strftime("%Y%m%d")
@@ -50,7 +51,7 @@ def fn_craw(stock_code='005930'):
     url = f"https://finance.naver.com/item/main.naver?code={gcode}"
     table_list = pd.read_html(url, encoding='euc-kr')
 
-    print(table_list)
+    print(table_list[11])
 
     return "hi"
 # 전일 대비 등락률
@@ -69,5 +70,47 @@ def chart(co):
     print(js)
     print(datetime.today().strftime("%Y%m%d"))
     return js
+@app.route('/article/<co>')
+def article(co):
+    tot_list = []
+
+    for p in range(1):
+        # 뉴스 기사 모인 페이지
+        url = 'https://m.stock.naver.com/domestic/stock/' + str(
+            co) + '/news/title'  # https://m.stock.naver.com/domestic/stock/003550/total
+        # F12누르면 나오는 네트워크상에서 찾아온 경로
+        # https://m.stock.naver.com/api/news/stock/005930?pageSize=20&page=1&searchMethod=title_entity_id.basic
+        url = "https://m.stock.naver.com/api/news/stock/" + str(
+            co) + "?pageSize=5&searchMethod=title_entity_id.basic&page=1"
+        res = requests.get(url)
+
+        news_list = json.loads(res.text)
+        # 페이지에서 가져온 전체 뉴스기사를 for문으로 분리
+        # print(news_list[0])
+        for i, news in enumerate(news_list):
+            # 신문사 id
+            a = news['items'][0]['officeId']
+            # 기사 id
+            b = news['items'][0]['articleId']
+            list = []
+            list.append(news['items'][0]['officeName'])  # 신문사
+            list.append(news['items'][0]['datetime'][:8])  # 날짜
+            list.append(news['items'][0]['title'].replace('&quot;', '\"'))  # 제목
+            list.append(news['items'][0]['imageOriginLink'])  # 이미지
+            list.append(news['items'][0]['body'].replace('&quot;', '\"'))  # 기사 내용
+            list.append('https://m.stock.naver.com/domestic/stock/005930/news/view/' + str(a) + '/' + str(b))  # 기사 url
+            tot_list.append(list)
+
+    news_df = pd.DataFrame(data=tot_list, columns=['offname', 'rdate', 'title', 'imgsrc', 'content', 'url'])
+    news_df['title'] = news_df['title'].str.replace('&amp;', '&')
+    news_df['content'] = news_df['content'].str.replace('&amp;', '&')
+
+    # news_df['title'] = [re.sub('[^A-Za-z0-9가-힣]', '' ,s) for s in news_df['title']]
+
+    # news_df.to_csv('css.csv',index=False)
+    # print(news_df)
+    json_str = news_df.to_json(orient="records",force_ascii=False)
+    print(json_str)
+    return json_str
 if __name__ == '__main__':
    app.run(debug=True)

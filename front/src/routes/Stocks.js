@@ -56,7 +56,7 @@ function Stocks() {
       <StockList>
         {stocks?.map((item) => (
           <Stock key={item.단축코드}>
-            <Link to={`/info/${item.cd.substr(1)}`} state={{ name: item.nm }}>
+            <Link to={`/${item.cd.substr(1)}`} state={{ name: item.nm }}>
               {item.cd.substr(1)} {item.nm} &rarr;
             </Link>
           </Stock>
