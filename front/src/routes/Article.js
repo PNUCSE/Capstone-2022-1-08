@@ -41,7 +41,7 @@ function Article() {
   const [article, setArticle] = useState([{}]);
   useEffect(() => {
     (async () => {
-      const response = await fetch(`/article/${code}`);
+      const response = await fetch(`/api/article/${code}`);
       const json = await response.json();
       console.log(json[0]);
       setArticle(json);
