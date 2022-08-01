@@ -8,7 +8,9 @@ import time
 import pandas as pd
 from pykrx import stock
 import json
+import cnn_lstm_conv1d as cnn_lstm
 import numpy as np
+import FinanceDataReader as fdr
 app = Flask(__name__)
 today=datetime.today().strftime("%Y%m%d")
 last_year =(datetime.today()-timedelta(365)).strftime("%Y%m%d")
@@ -112,5 +114,20 @@ def article(co):
     json_str = news_df.to_json(orient="records",force_ascii=False)
     print(json_str)
     return json_str
+
+@app.route('/api/cnn/<co>')
+def cnn(co):
+
+    data = fdr.DataReader(str(co), '2010-01-01')
+    data = cnn_lstm.erase_zero(data)
+    train_X, train_Y, test_X, test_Y = cnn_lstm.create_window_set(data, column=3, window_size=50)
+    model = cnn_lstm.build_model(window_size=50)
+    history = model.fit(train_X, train_Y, validation_data=(test_X, test_Y), epochs=1, batch_size=64, verbose=1,
+                        shuffle=False)
+    df=cnn_lstm.predict(model, data[len(train_X):], 3, test_X, test_Y)
+    df=np.array(df).ravel().tolist()
+    print(df)
+    return jsonify({'data':df})
+
 if __name__ == '__main__':
    app.run(debug=True)
