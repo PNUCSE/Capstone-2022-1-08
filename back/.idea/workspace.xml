@@ -110,7 +110,11 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/main.py</url>
+<<<<<<< HEAD
           <line>131</line>
+=======
+          <line>114</line>
+>>>>>>> upstream/main
           <option name="timeStamp" value="2" />
         </line-breakpoint>
       </breakpoints>

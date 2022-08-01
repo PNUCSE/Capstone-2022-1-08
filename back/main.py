@@ -72,7 +72,7 @@ def up_down(co):
     return js
 
 
-@app.route('/info/<co>')
+@app.route('/api/info/<co>')
 def chart(co):
     print(co)
     df = stock.get_market_ohlcv_by_date(last_year, today, co)
@@ -83,7 +83,7 @@ def chart(co):
     return js
 
 
-@app.route('/article/<co>')
+@app.route('/api/article/<co>')
 def article(co):
     tot_list = []
 
