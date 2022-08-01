@@ -94,17 +94,17 @@ function Info() {
 
   useEffect(() => {
     // 종목 가격 불러오기 1.날짜 2.시가 3.고가 4.저가 5.종가
-    fetch(`/info/${stockId}`)
+    fetch(`/api/info/${stockId}`)
       .then((res) => res.json())
       .then((data) => {
         setstockData(data.data);
       });
     // 연관기업코드
     (async () => {
-      const response = await fetch("/relate");
+      const response = await fetch("/api/relate");
       const json = await response.json();
       setRelate(json.codes.slice(1));
-      const updownResponse = await fetch(`/up_down/${stockId}`);
+      const updownResponse = await fetch(`/api/up_down/${stockId}`);
       const updownJson = await updownResponse.json();
       setUpdown(updownJson.data);
       setLoading(false);

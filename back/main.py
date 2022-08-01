@@ -1,8 +1,8 @@
-from flask import Flask,request,jsonify
+from flask import Flask, request, jsonify
 from flask import jsonify
 import requests
 from bs4 import BeautifulSoup
-from datetime import datetime ,timedelta
+from datetime import datetime, timedelta
 from time import sleep
 import time
 import pandas as pd
@@ -12,23 +12,27 @@ import cnn_lstm_conv1d as cnn_lstm
 import numpy as np
 import FinanceDataReader as fdr
 app = Flask(__name__)
-today=datetime.today().strftime("%Y%m%d")
-last_year =(datetime.today()-timedelta(365)).strftime("%Y%m%d")
-@app.route('/relate')
+today = datetime.today().strftime("%Y%m%d")
+last_year = (datetime.today()-timedelta(365)).strftime("%Y%m%d")
+
+
+@app.route('/api/relate')
 def relate_code_crawl(co='005930'):
-    #연관 종목코드 있는 페이지 불러오기
-    url='https://finance.naver.com/item/main.naver?code='+str(co)
-    page=pd.read_html(url,encoding='CP949')
-    #연관 종목명과 종목코드 뽑아내기(code_list[0]은 '종목명'이어서 제외)
-    code_list=page[4].columns.tolist()
-    code_list=code_list[1:]
-    #종목코드 리스트 반환
-    codes=[]
+    # 연관 종목코드 있는 페이지 불러오기
+    url = 'https://finance.naver.com/item/main.naver?code='+str(co)
+    page = pd.read_html(url, encoding='CP949')
+    # 연관 종목명과 종목코드 뽑아내기(code_list[0]은 '종목명'이어서 제외)
+    code_list = page[4].columns.tolist()
+    code_list = code_list[1:]
+    # 종목코드 리스트 반환
+    codes = []
     for word in (code_list):
         codes.append(word[-6:])
 
-    return {"codes":codes}
-@app.route('/fn')
+    return {"codes": codes}
+
+
+@app.route('/api/fn')
 def fn_craw(stock_code='005930'):
     """
        # 테이블만 크롤링
@@ -57,21 +61,28 @@ def fn_craw(stock_code='005930'):
 
     return "hi"
 # 전일 대비 등락률
-@app.route('/up_down/<co>')
+
+
+@app.route('/api/up_down/<co>')
 def up_down(co):
     url = f"https://finance.naver.com/item/main.naver?code={co}"
     table_list = pd.read_html(url, encoding='euc-kr')
-    js = table_list[4].iloc[1:3, [1]].to_json(orient='split', force_ascii=False)
+    js = table_list[4].iloc[1:3, [1]].to_json(
+        orient='split', force_ascii=False)
     return js
+
+
 @app.route('/info/<co>')
 def chart(co):
     print(co)
     df = stock.get_market_ohlcv_by_date(last_year, today, co)
-    js = df.to_json(orient='table', force_ascii=False ,date_format='iso')
+    js = df.to_json(orient='table', force_ascii=False, date_format='iso')
     print(df)
     print(js)
     print(datetime.today().strftime("%Y%m%d"))
     return js
+
+
 @app.route('/article/<co>')
 def article(co):
     tot_list = []
@@ -97,13 +108,17 @@ def article(co):
             list = []
             list.append(news['items'][0]['officeName'])  # 신문사
             list.append(news['items'][0]['datetime'][:8])  # 날짜
-            list.append(news['items'][0]['title'].replace('&quot;', '\"'))  # 제목
+            list.append(news['items'][0]['title'].replace(
+                '&quot;', '\"'))  # 제목
             list.append(news['items'][0]['imageOriginLink'])  # 이미지
-            list.append(news['items'][0]['body'].replace('&quot;', '\"'))  # 기사 내용
-            list.append('https://m.stock.naver.com/domestic/stock/005930/news/view/' + str(a) + '/' + str(b))  # 기사 url
+            list.append(news['items'][0]['body'].replace(
+                '&quot;', '\"'))  # 기사 내용
+            list.append('https://m.stock.naver.com/domestic/stock/005930/news/view/' +
+                        str(a) + '/' + str(b))  # 기사 url
             tot_list.append(list)
 
-    news_df = pd.DataFrame(data=tot_list, columns=['offname', 'rdate', 'title', 'imgsrc', 'content', 'url'])
+    news_df = pd.DataFrame(data=tot_list, columns=[
+                           'offname', 'rdate', 'title', 'imgsrc', 'content', 'url'])
     news_df['title'] = news_df['title'].str.replace('&amp;', '&')
     news_df['content'] = news_df['content'].str.replace('&amp;', '&')
 
@@ -111,23 +126,26 @@ def article(co):
 
     # news_df.to_csv('css.csv',index=False)
     # print(news_df)
-    json_str = news_df.to_json(orient="records",force_ascii=False)
+    json_str = news_df.to_json(orient="records", force_ascii=False)
     print(json_str)
     return json_str
+
 
 @app.route('/api/cnn/<co>')
 def cnn(co):
 
     data = fdr.DataReader(str(co), '2010-01-01')
     data = cnn_lstm.erase_zero(data)
-    train_X, train_Y, test_X, test_Y = cnn_lstm.create_window_set(data, column=3, window_size=50)
+    train_X, train_Y, test_X, test_Y = cnn_lstm.create_window_set(
+        data, column=3, window_size=50)
     model = cnn_lstm.build_model(window_size=50)
     history = model.fit(train_X, train_Y, validation_data=(test_X, test_Y), epochs=1, batch_size=64, verbose=1,
                         shuffle=False)
-    df=cnn_lstm.predict(model, data[len(train_X):], 3, test_X, test_Y)
-    df=np.array(df).ravel().tolist()
+    df = cnn_lstm.predict(model, data[len(train_X):], 3, test_X, test_Y)
+    df = np.array(df).ravel().tolist()
     print(df)
-    return jsonify({'data':df})
+    return jsonify({'data': df})
+
 
 if __name__ == '__main__':
-   app.run(debug=True)
+    app.run(debug=True)
