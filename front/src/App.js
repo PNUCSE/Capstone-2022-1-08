@@ -1,6 +1,12 @@
 import { createGlobalStyle } from "styled-components";
 import Router from "./Router";
-
+import {
+  RecoilRoot,
+  atom,
+  selector,
+  useRecoilState,
+  useRecoilValue,
+} from 'recoil';
 const GlobalStyle = createGlobalStyle`
 @import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400&display=swap');
 font-family: 'Source Sans Pro', sans-serif;
@@ -65,10 +71,10 @@ table {
 `;
 function App() {
   return (
-    <>
+    <RecoilRoot>
       <GlobalStyle />
       <Router />
-    </>
+    </RecoilRoot>
   );
 }
 export default App;

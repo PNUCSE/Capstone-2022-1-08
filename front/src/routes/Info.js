@@ -12,6 +12,7 @@ import styled from "styled-components";
 import ApexChart from "react-apexcharts";
 import Finance from "./Finance";
 import Article from "./Article";
+import { atom, useRecoilState } from "recoil";
 const Container = styled.div`
   padding: 0px 20px;
   max-width: 1000px;
@@ -39,7 +40,7 @@ const Overview = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color:white;
   padding: 10px 20px;
   border-radius: 10px;
 `;
@@ -66,7 +67,7 @@ const Tab = styled.span`
   text-transform: uppercase;
   font-size: 12px;
   font-weight: 400;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: white;
   padding: 7px 0px;
   border-radius: 10px;
   color: ${(props) =>
@@ -79,8 +80,15 @@ const Tab = styled.span`
 const Description = styled.p`
   margin: 20px 0px;
 `;
+export const stockCode= atom({
+  key:'stockCode',
+  default:''
+})
 function Info() {
   const { stockId } = useParams();
+  const [code,setCode]=useRecoilState(stockCode);
+  setCode(stockId);
+  console.log(code);
   const { state } = useLocation();
   console.log(useLocation());
   const name = state.name;
@@ -88,6 +96,7 @@ function Info() {
   const [stockData, setstockData] = useState([{}]); //날짜별 가격
   const [updown, setUpdown] = useState([[]]);
   const [relate, setRelate] = useState([]);
+  const [predict,setPredict]=useState([{}]); //예측가격
   const articleMatch = useMatch("/:stockId/article");
   const financeMatch = useMatch("/:stockId/finance");
 
@@ -100,17 +109,18 @@ function Info() {
       });
     // 연관기업코드
     (async () => {
-      const response = await fetch("/api/relate");
-      const json = await response.json();
-      setRelate(json.codes.slice(1));
       const updownResponse = await fetch(`/api/up_down/${stockId}`);
       const updownJson = await updownResponse.json();
+      const predResponse = await fetch(`/api/cnn/${stockId}`);
+      const predJson = await predResponse.json();
+      setPredict(predJson.data)
       setUpdown(updownJson.data);
       setLoading(false);
     })();
   }, []);
   console.log(relate);
   console.log(stockData);
+  console.log(predict);
   // const isUp = updown[0][0].substr(0, 3);
   // console.log(isUp);
   return (
@@ -156,10 +166,14 @@ function Info() {
                   name: "sales",
                   data: stockData?.map((price) => price.종가),
                 },
+                {
+                  name: "predict",
+                  data: predict?.map((price)=>price)
+                }
               ]}
               options={{
                 theme: {
-                  mode: "dark",
+                  mode:"light"
                 },
                 chart: {
                   toolbar: {

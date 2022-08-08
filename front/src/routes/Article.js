@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
+import { useRecoilValue } from "recoil";
 import styled from "styled-components";
-
+import { stockCode } from "./Info";
 const Container = styled.div`
   border-radius: 15px;
   margin: 0 auto;
@@ -36,14 +37,12 @@ const Date = styled.span`
   font-size: 0.9375em;
 `;
 function Article() {
-  const location = useLocation();
-  const code = location.pathname.substring(1, 7);
+  const code = useRecoilValue(stockCode);
   const [article, setArticle] = useState([{}]);
   useEffect(() => {
     (async () => {
       const response = await fetch(`/api/article/${code}`);
       const json = await response.json();
-      console.log(json[0]);
       setArticle(json);
     })();
   }, []);

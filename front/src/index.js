@@ -2,21 +2,26 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import { ThemeProvider } from "styled-components";
+import { Query, QueryClient, QueryClientProvider } from "react-query";
+import { ReactQueryDevtools } from "react-query/devtools";
 const root = ReactDOM.createRoot(document.getElementById("root"));
+const queryClient = new QueryClient();
 const darkTheme = {
-  bgColor: "#2f3640",
-  textColor: "#f5f6fa",
+  bgColor: "whitesmoke",
+  textColor: "#111",
   accentColor: "#9c88ff",
 };
 const lightTheme = {
-  textColor: "#111",
-  backgroundColor: "whitesmoke",
+  textColor: "#f5f6fa",
+  backgroundColor: "#2f3640",
 };
 root.render(
   <React.StrictMode>
-    <ThemeProvider theme={darkTheme}>
-      <App />
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider theme={darkTheme}>
+        <App />
+      </ThemeProvider>
+    </QueryClientProvider>
   </React.StrictMode>
 );
 
