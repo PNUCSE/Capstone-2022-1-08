@@ -26,7 +26,7 @@ const Header = styled.header`
 const StockList = styled.ul``;
 const Stock = styled.li`
   background-color: white;
-  color: ${(props) => props.theme.bgColor};
+  color: ${(props) => props.theme.textColor};
   margin-bottom: 10px;
   padding: 20px;
   border-radius: 15px;

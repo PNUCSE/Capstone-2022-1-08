@@ -11,13 +11,20 @@ import json
 import cnn_lstm_conv1d as cnn_lstm
 import numpy as np
 import FinanceDataReader as fdr
+import re
+
+
+
 app = Flask(__name__)
 today = datetime.today().strftime("%Y%m%d")
 last_year = (datetime.today()-timedelta(365)).strftime("%Y%m%d")
 
+# -------- 코드를 기업이름으로 변환
+def stc_code_to_nm(stock_code):
+    stock_name = stock.get_market_ticker_name(stock_code)
+    return stock_name
 
-@app.route('/api/relate')
-def relate_code_crawl(co='005930'):
+def relate_code_crawl(co):
     # 연관 종목코드 있는 페이지 불러오기
     url = 'https://finance.naver.com/item/main.naver?code='+str(co)
     page = pd.read_html(url, encoding='CP949')
@@ -29,10 +36,9 @@ def relate_code_crawl(co='005930'):
     for word in (code_list):
         codes.append(word[-6:])
 
-    return {"codes": codes}
+    return codes
 
 
-@app.route('/api/fn')
 def fn_craw(stock_code='005930'):
     """
        # 테이블만 크롤링
@@ -57,9 +63,9 @@ def fn_craw(stock_code='005930'):
     url = f"https://finance.naver.com/item/main.naver?code={gcode}"
     table_list = pd.read_html(url, encoding='euc-kr')
 
-    print(table_list[11])
+    # print(table_list[3]['최근 연간 실적'].iloc[:,2])
 
-    return "hi"
+    return table_list
 # 전일 대비 등락률
 
 
@@ -133,13 +139,12 @@ def article(co):
 
 @app.route('/api/cnn/<co>')
 def cnn(co):
-
-    data = fdr.DataReader(str(co), '2010-01-01')
+    data = fdr.DataReader(str(co), last_year)
     data = cnn_lstm.erase_zero(data)
     train_X, train_Y, test_X, test_Y = cnn_lstm.create_window_set(
         data, column=3, window_size=50)
     model = cnn_lstm.build_model(window_size=50)
-    history = model.fit(train_X, train_Y, validation_data=(test_X, test_Y), epochs=1, batch_size=64, verbose=1,
+    history = model.fit(train_X, train_Y, validation_data=(test_X, test_Y), epochs=3, batch_size=64, verbose=1,
                         shuffle=False)
     df = cnn_lstm.predict(model, data[len(train_X):], 3, test_X, test_Y)
     df = np.array(df).ravel().tolist()
@@ -147,5 +152,93 @@ def cnn(co):
     return jsonify({'data': df})
 
 
+#----2022-08-05------
+"""
+    # <지표 설명>
+    # 1. 배당 분석                      -> 배당성향(배당 커버리지의 역수.)
+    # 2. 유동성 분석(단기채무지급능력)    -> 당좌비율(당좌자산 / 유동부채)
+    # 3. 재무건전성 분석(레버리지 비율)   -> 부채비율(총부채 / 자기자본)의 역수
+    # 4. 수익성분석                      -> 매출수익성(당기순이익/매출액))
+    # 5. 성장성분석                      -> 순이익성장률
+"""
+def idv_radar(co):
+    nm = stc_code_to_nm(co)
+    sil_df = fn_craw(co)[3]
+    if (sil_df.iloc[0:8, 3].isna().sum()) > 0:  # 표 안 가르고 계산하는 건 신규 상장 기업은 정보가 아예 없기 때문
+        pass
+    elif (sil_df.iloc[0:8, 9].isna().sum()) > 0:  # 표 안 가르고 계산하는 건 신규 상장 기업은 정보가 아예 없기 때문
+        pass
+    else:
+        # 0. 재무정보는 최신 분기 실공시 기준
+        # 0. 단, 배당은 1년에 한 번 이루어지기 때문에 최신 년도 공시 기준임
+        sil_df_y = sil_df['최근 연간 실적'].iloc[:, 2]  # 느리지만 .iloc으로 하는 이유는 공시 날짜가 다른 기업이 있기 때문
+        sil_df_q = sil_df['최근 분기 실적'].iloc[:, 4]
+
+        sil_df_y = sil_df_y.fillna(0)
+        sil_df_q = sil_df_q.fillna(0)
+
+        if sil_df_y.dtype == 'O':
+            sil_df_y = sil_df_y.apply(lambda x: re.sub('^-$', '0', '{}'.format(x)))
+            sil_df_y = sil_df_y.astype('float')
+
+        if sil_df_q.dtype == 'O':
+            sil_df_q = sil_df_q.apply(lambda x: re.sub('^-$', '0', '{}'.format(x)))
+            sil_df_q = sil_df_q.astype('float')
+        # 1. 배당성향(bd_tend)
+        bd_tend = sil_df_y[15]  # 실제 배당 성향
+        
+        # 2. 유동성 분석 - 당좌비율(당좌자산/유동부채)
+        #                       당좌자산 = (유동자산 - 재고자산)
+        dj_rate = sil_df_q[7]  # 당좌비율
+
+        # 3. 재무건전성 분석 - 부채비율(총부채/자기자본)의 역수
+        bch_rate = sil_df_q[6] / 100  # 부채비율
+        bch_rate = round((1 / bch_rate) * 100, 2)
+
+        # 4. 수익성 분석 - 매출수익성(당기순이익/매출액) # TODO 매출액 0인 애들은?
+
+        dg_bene = sil_df_q[2]
+        mch = sil_df_q[0]
+
+        suyk = round((dg_bene / mch) * 100, 2)
+
+        # 5. 성장성 분석 - 순이익성장률(지속성장 가능률)
+        # (1-배당성향)*자기자본순이익률(ROE)
+        #    유보율
+
+        roe = sil_df_y[5] / 100
+        ubo = (100 - bd_tend) / 100
+        grth = round(roe * ubo * 100, 2)
+        data_arr=np.array([bd_tend, dj_rate, bch_rate, suyk, grth])
+
+        return data_arr,nm
+
+# 유사 업종 비교
+#idv_radar, relate_radar
+
+
+
+@app.route('/api/relate_data/<co>')
+def relate_data(co):
+    print("co:"+co)
+    label_list=['배당성향','유동성','건전성','수익성','성장성']
+    arr_list=[]
+    relate_corp = relate_code_crawl(co)
+    arr_list = [idv_radar(co=code)for code in relate_corp]
+    nm_list = [x[1] for x in arr_list if x is not None]
+    arr_list = [x[0] for x in arr_list if x is not None]
+    arr_list = np.array(arr_list)
+    arr_list[:, 0] = (arr_list[:, 0] / arr_list[:, 0].mean()) * 100
+    arr_list[:, 1] = (arr_list[:, 1] / arr_list[:, 1].mean()) * 100
+    arr_list[:, 2] = (arr_list[:, 2] / arr_list[:, 2].mean()) * 100
+    arr_list[:, 3] = (arr_list[:, 3] / arr_list[:, 3].mean()) * 100
+    arr_list[:, 4] = (arr_list[:, 4] / arr_list[:, 4].mean()) * 100
+    dict_list = []
+    for i, nm in enumerate(nm_list):
+        dic = {}
+        dic[nm] = arr_list[i, :].tolist()
+        dict_list.append(dic)
+    print(json.dumps(dict_list, ensure_ascii=False))
+    return json.dumps(dict_list, ensure_ascii=False)
 if __name__ == '__main__':
     app.run(debug=True)
