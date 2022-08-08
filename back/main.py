@@ -241,4 +241,4 @@ def relate_data(co):
     print(json.dumps(dict_list, ensure_ascii=False))
     return json.dumps(dict_list, ensure_ascii=False)
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
