@@ -3,6 +3,7 @@ import { useRecoilValue } from "recoil";
 import { stockCode } from "./Info";
 import ApexChart from "react-apexcharts";
 import ReactApexChart from "react-apexcharts";
+import MLtest from "./MLtest";
 function Finance() {
   // 유사업종비교
   const code = useRecoilValue(stockCode);
@@ -17,23 +18,12 @@ function Finance() {
   },[])
   return (
     <div>
-
       {/* 기업명 */}
       {/* {Object.keys(data)}  */}
       {/* '배당성향','유동성','건전성','수익성','성장성' */}
       {/* {data[Object.keys(data)]} */}
       <ReactApexChart
         type="radar"
-        // series={[{
-        //   name: 'Series 1',
-        //   data: [80, 50, 30, 40, 100],
-        // }, {
-        //   name: 'Series 2',
-        //   data: [20, 30, 40, 80, 20],
-        // }, {
-        //   name: 'Series 3',
-        //   data: [44, 76, 78, 13, 43],
-        // }]}
         series={relate?.map(elem=>(
           {
             name:Object.keys(elem),

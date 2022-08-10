@@ -13,6 +13,7 @@ import ApexChart from "react-apexcharts";
 import Finance from "./Finance";
 import Article from "./Article";
 import { atom, useRecoilState } from "recoil";
+import Trend from "./Trend";
 const Container = styled.div`
   padding: 0px 20px;
   max-width: 1000px;
@@ -215,6 +216,7 @@ function Info() {
           <Outlet />
         </>
       )}
+      <Trend/>
     </Container>
   );
 }
