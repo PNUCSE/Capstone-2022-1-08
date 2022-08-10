@@ -12,9 +12,18 @@ import cnn_lstm_conv1d as cnn_lstm
 import numpy as np
 import FinanceDataReader as fdr
 import re
+import os
+import sys
+import urllib.request
+client_id = "vXyRpnX778p3HV9msFsS"
+client_secret = "MvxaxQ9bw8"
+code="005930"
+# 검색어 트렌드 주소
+url = "https://openapi.naver.com/v1/datalab/search"; 
+# body = "{\"startDate\":\"2017-01-01\",\"endDate\":\"2017-04-30\",\"timeUnit\":\"month\",\"keywordGroups\":[{\"groupName\":\"한글\",\"keywords\":[\]},{\"groupName\":\"영어\",\"keywords\":[\"영어\",\"english\"]}],\"device\":\"pc\",\"ages\":[\"1\",\"2\"],\"gender\":\"f\"}";
 
 
-
+# body = urllib.parse.urlencode(body)
 app = Flask(__name__)
 today = datetime.today().strftime("%Y%m%d")
 last_year = (datetime.today()-timedelta(365)).strftime("%Y%m%d")
@@ -220,7 +229,6 @@ def idv_radar(co):
 
 @app.route('/api/relate_data/<co>')
 def relate_data(co):
-    print("co:"+co)
     label_list=['배당성향','유동성','건전성','수익성','성장성']
     arr_list=[]
     relate_corp = relate_code_crawl(co)
@@ -240,5 +248,44 @@ def relate_data(co):
         dict_list.append(dic)
     print(json.dumps(dict_list, ensure_ascii=False))
     return json.dumps(dict_list, ensure_ascii=False)
+
+# 2022 08 09 
+@app.route('/api/trend/<co>')
+def trend(co):
+    nm = stc_code_to_nm(co)
+    body={
+    "startDate": "2017-01-01",
+    "endDate": "2017-04-30",
+    "timeUnit": "month",
+    "keywordGroups": [
+        {
+        "groupName": nm,
+        "keywords": [
+            nm,
+        ]
+        },
+       
+    ],
+    "device": "pc",
+    "ages": [
+        "1",
+        "2"
+    ],
+    "gender": "f"
+    }
+    body = json.dumps(body)
+    request = urllib.request.Request(url)
+    request.add_header("X-Naver-Client-Id",client_id)
+    request.add_header("X-Naver-Client-Secret",client_secret)
+    request.add_header("Content-Type","application/json")
+    response = urllib.request.urlopen(request, data=body.encode("utf-8"))
+    rescode = response.getcode()
+    if(rescode==200):
+        response_body = response.read()
+        print(response_body.decode('utf-8'))
+    else:
+        print("Error Code:" + rescode)
+    return response_body
+
 if __name__ == '__main__':
     app.run(debug=False)
