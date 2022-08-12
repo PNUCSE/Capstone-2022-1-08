@@ -4,7 +4,7 @@ import { stockCode } from "./Info";
 import ApexChart from "react-apexcharts";
 function Trend(){
     const code = useRecoilValue(stockCode);
-    const [trend,setTrend] = useState({});
+    const [trend,setTrend] = useState();
     useEffect(()=>{
         (async()=>{
             const response=await fetch(`/api/trend/${code}`);

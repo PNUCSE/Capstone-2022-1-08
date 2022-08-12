@@ -14,12 +14,55 @@ import Finance from "./Finance";
 import Article from "./Article";
 import { atom, useRecoilState } from "recoil";
 import Trend from "./Trend";
+import MLtest from "./MLtest";
 const Container = styled.div`
   padding: 0px 20px;
-  max-width: 1000px;
-  margin: 0 auto;
 `;
-
+const Chart = styled.div`
+  background-color:white;
+  height:420px;
+  width:100%;
+  display:flex;
+  margin-bottom:10px;
+`
+const Test = styled.div`
+  margin-left: 10px;
+  margin-right:10px;
+  display:flex;
+  width:30%;
+  align-items: center;
+  flex-direction: column;
+  >span{
+    font-size: 30px;
+    height:12%;
+    margin:10px;
+    font-weight: 400;
+    color:${(props) => props.theme.accentColor};
+    border-bottom:2px solid #E6E9ED;  
+`
+const TestRow = styled.div`
+    display:flex;
+    width:100%;
+    margin:20px;
+    align-item:center;
+    justify-content:space-between;
+    span:first-child {
+      font-size: 20px;
+      color:${(props) => props.theme.accentColor};
+      font-weight: 400;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+    span:not(:first-child){
+      color:#73879C;
+      font-size:20px;
+    }
+`
+// 두번째줄부터
+const Row = styled.div`
+  display:flex;
+  justify-content:center;
+`
 const Loader = styled.span`
   text-align: center;
   display: block;
@@ -27,21 +70,23 @@ const Loader = styled.span`
 
 const Title = styled.h1`
   color: ${(props) => props.theme.accentColor};
-  font-size: 48px;
+  font-size: 25px;
+  font-weight:500;
 `;
 
 const Header = styled.header`
-  height: 10vh;
+  height: 5vh;
   display: flex;
-  justify-content: center;
+  justify-content: ;
   align-items: center;
+  background-color:white;
+  margin-bottom:7px;
+  padding-left:15px;
 `;
 
 const Overview = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  background-color:white;
   padding: 10px 20px;
   border-radius: 10px;
 `;
@@ -125,21 +170,14 @@ function Info() {
   // const isUp = updown[0][0].substr(0, 3);
   // console.log(isUp);
   return (
-    <Container>
-      <Header>
-        <Title>{name}</Title>
-      </Header>
+    <Container>  
       {loading ? (
         <Loader>loading...</Loader>
       ) : (
         <>
           <Overview>
             <OverviewItem>
-              <span>종목코드:</span>
-              <span>{stockId}</span>
-            </OverviewItem>
-            <OverviewItem>
-              <span>현재가:</span>
+              <span>{name}</span>
               {/* 최신날짜 종가 */}
               <span>{stockData[stockData.length - 1].종가}</span>
               <span>
@@ -158,9 +196,13 @@ function Info() {
               </span>
             </OverviewItem>
           </Overview>
-
-          <div>
-            <ApexChart
+          <Header>
+              <Title>{name} 주가 차트</Title>
+          </Header>
+          <Chart>
+            <ApexChart 
+              height="70%"
+              width="300%"
               type="line"
               series={[
                 {
@@ -176,18 +218,24 @@ function Info() {
                 theme: {
                   mode:"light"
                 },
+                tooltip: {
+                  y: {
+                    formatter: (value) => `$${value.toFixed(2)}`,
+                  },
+                },
                 chart: {
                   toolbar: {
                     show: false,
                   },
-                  height: 500,
+            
+                 
                 },
                 grid: {
                   show: true,
                 },
                 stroke: {
                   curve: "smooth",
-                  width: 3,
+                  width: 2,
                 },
                 xaxis: {
                   type: "datetime",
@@ -196,12 +244,35 @@ function Info() {
                     style: {
                       colors: "#9c88ff",
                     },
+                    
                   },
                 },
+                yaxis:{
+                  floating:false,
+                  decimalsInFloat: undefined,
+                  labels:{
+                    formatter:(value) => `$${value.toFixed(0)}`,
+                  }
+                }
               }}
             />
-          </div>
-          <Tabs>
+            <Test>
+              <span>다음 장날 주가 예측</span>
+              <TestRow>
+                <span>{name} 고가</span>
+                <span>\가격</span>
+              </TestRow>
+              <TestRow>
+                <span>{name} 저가</span>
+                <span>\가격</span>
+              </TestRow>
+              <TestRow>
+                <span>{name} 종가</span>
+                <span>\가격</span>
+              </TestRow>
+            </Test>
+          </Chart>
+          {/* <Tabs>
             <Tab isActive={financeMatch !== null}>
               <Link to="finance" state={{ name }}>
                 finance
@@ -212,11 +283,18 @@ function Info() {
                 Article
               </Link>
             </Tab>
-          </Tabs>
+          </Tabs> */}
+          <Row>
+            <Finance/>
+            <Article/>
+            <Article/>
+          </Row>
+          
           <Outlet />
         </>
       )}
-      <Trend/>
+      
+      {/* <Trend/> */}
     </Container>
   );
 }

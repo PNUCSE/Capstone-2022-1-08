@@ -4,11 +4,12 @@ import { useRecoilValue } from "recoil";
 import styled from "styled-components";
 import { stockCode } from "./Info";
 const Container = styled.div`
-  border-radius: 15px;
-  margin: 0 auto;
-  background-color: rgba(0, 0, 0, 0.5);
+  margin: 10px auto;
+  background-color:white;
   box-sizing: border-box;
   padding: 15px;
+  width:30%;
+  float:right;
 `;
 
 const Header = styled.header`

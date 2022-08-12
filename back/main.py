@@ -15,15 +15,12 @@ import re
 import os
 import sys
 import urllib.request
+
+#네이버 API KEY
 client_id = "vXyRpnX778p3HV9msFsS"
 client_secret = "MvxaxQ9bw8"
-code="005930"
 # 검색어 트렌드 주소
 url = "https://openapi.naver.com/v1/datalab/search"; 
-# body = "{\"startDate\":\"2017-01-01\",\"endDate\":\"2017-04-30\",\"timeUnit\":\"month\",\"keywordGroups\":[{\"groupName\":\"한글\",\"keywords\":[\]},{\"groupName\":\"영어\",\"keywords\":[\"영어\",\"english\"]}],\"device\":\"pc\",\"ages\":[\"1\",\"2\"],\"gender\":\"f\"}";
-
-
-# body = urllib.parse.urlencode(body)
 app = Flask(__name__)
 today = datetime.today().strftime("%Y%m%d")
 last_year = (datetime.today()-timedelta(365)).strftime("%Y%m%d")
