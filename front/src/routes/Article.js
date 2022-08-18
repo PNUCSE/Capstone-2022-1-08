@@ -3,13 +3,12 @@ import { useLocation } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import styled from "styled-components";
 import { stockCode } from "./Info";
-const Container = styled.div`
-  margin: 10px auto;
+export const Container = styled.div`
+  margin: 10px 0px;
   background-color:white;
   box-sizing: border-box;
-  padding: 15px;
-  width:30%;
-  float:right;
+  padding: 10px;
+  width:33%;
 `;
 
 const Header = styled.header`

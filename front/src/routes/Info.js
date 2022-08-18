@@ -15,6 +15,7 @@ import Article from "./Article";
 import { atom, useRecoilState } from "recoil";
 import Trend from "./Trend";
 import MLtest from "./MLtest";
+import Ifrs from "./Ifrs";
 const Container = styled.div`
   padding: 0px 20px;
 `;
@@ -61,7 +62,7 @@ const TestRow = styled.div`
 // 두번째줄부터
 const Row = styled.div`
   display:flex;
-  justify-content:center;
+  justify-content:space-between;
 `
 const Loader = styled.span`
   text-align: center;
@@ -143,8 +144,6 @@ function Info() {
   const [updown, setUpdown] = useState([[]]);
   const [relate, setRelate] = useState([]);
   const [predict,setPredict]=useState([{}]); //예측가격
-  const articleMatch = useMatch("/:stockId/article");
-  const financeMatch = useMatch("/:stockId/finance");
 
   useEffect(() => {
     // 종목 가격 불러오기 1.날짜 2.시가 3.고가 4.저가 5.종가
@@ -286,7 +285,7 @@ function Info() {
           </Tabs> */}
           <Row>
             <Finance/>
-            <Article/>
+            <Ifrs/>
             <Article/>
           </Row>
           

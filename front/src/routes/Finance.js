@@ -7,8 +7,9 @@ import MLtest from "./MLtest";
 import styled from "styled-components";
 import Article from "./Article";
 const Container = styled.div`
-margin:10px;  
-background-color:white;
+  margin:10px 0px;  
+  background-color:white;
+  box-sizing: border-box;
   height:420px;
   width:30%;
   display:inline-block;
