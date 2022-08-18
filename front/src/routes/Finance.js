@@ -3,7 +3,7 @@ import { useRecoilValue } from "recoil";
 import { stockCode } from "./Info";
 import ApexChart from "react-apexcharts";
 import ReactApexChart from "react-apexcharts";
-import MLtest from "./MLtest";
+
 function Finance() {
   // 유사업종비교
   const code = useRecoilValue(stockCode);
