@@ -2,9 +2,20 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { com_df } from "../com_df";
+
+const StyledButton = styled.button`
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 1rem;
+  line-height: 1.5;
+  border: 1px solid lightgray;
+  color: gray;
+  background: white;
+`;
+
 const Title = styled.h1`
   color: ${(props) => props.theme.accentColor};
-  font-size: 48px;
+  font-size: 50px;
 `;
 
 const Loader = styled.span`
@@ -51,7 +62,7 @@ function Stocks() {
   return (
     <Container>
       <Header>
-        <Title>Stocks</Title>
+          <Title>Stocks</Title>
       </Header>
       <StockList>
         {stocks?.map((item) => (

@@ -7,6 +7,7 @@ import {
   Outlet,
   Link,
   useMatch,
+  Router,
 } from "react-router-dom";
 import styled from "styled-components";
 import ApexChart from "react-apexcharts";
@@ -14,8 +15,19 @@ import Finance from "./Finance";
 import Article from "./Article";
 import { atom, useRecoilState } from "recoil";
 import Trend from "./Trend";
-import MLtest from "./MLtest";
+
 import Ifrs from "./Ifrs";
+
+const StyledButton = styled.button`
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 1rem;
+  line-height: 1.5;
+  border: 1px solid lightgray;
+  color: gray;
+  background: white;
+`;
+
 const Container = styled.div`
   padding: 0px 20px;
 `;
@@ -71,8 +83,12 @@ const Loader = styled.span`
 
 const Title = styled.h1`
   color: ${(props) => props.theme.accentColor};
+<<<<<<< HEAD
   font-size: 25px;
   font-weight:500;
+=======
+  font-size: 50px;
+>>>>>>> e900a398cf0aaddcd77ab5e38033945bc775bedc
 `;
 
 const Header = styled.header`
@@ -169,7 +185,13 @@ function Info() {
   // const isUp = updown[0][0].substr(0, 3);
   // console.log(isUp);
   return (
-    <Container>  
+    <Container>
+      <Link to="/">
+        <StyledButton>Home</StyledButton>
+      </Link>
+      <Header>
+        <Title>{name}</Title>
+      </Header>
       {loading ? (
         <Loader>loading...</Loader>
       ) : (

@@ -9,11 +9,10 @@ import matplotlib.pyplot as plt
 from pandas.plotting import autocorrelation_plot
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
-from tensorflow.keras.layers import Conv1D, LSTM, Dense, Dropout, Bidirectional, TimeDistributed
-from tensorflow.keras.layers import MaxPooling1D, Flatten
+from tensorflow.keras.layers import * 
+from tensorflow.keras.layers import * 
 from tensorflow.keras.regularizers import L1, L2
 from tensorflow.keras.metrics import Accuracy
-from tensorflow.keras.metrics import RootMeanSquaredError
 
 
 def erase_zero(data):
@@ -21,10 +20,11 @@ def erase_zero(data):
   data.fillna(data.mean(), inplace=True)
   return data
 
-def create_window_set(df, column, window_size):
+def create_window_set(df, window_size, test_size=0.2):
   X = []
   Y = []
-  for i in range(1 , len(df) - window_size -1 , 1):
+  column = 5
+  for i in range(0 , len(df) - window_size, 1):
     first = df.iloc[i,column]
     temp = []
     temp2 = []
@@ -37,7 +37,7 @@ def create_window_set(df, column, window_size):
     X.append(np.array(temp).reshape(window_size, 1))
     Y.append(np.array(temp2).reshape(1, 1))
   
-  x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.2, shuffle=False)
+  x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=test_size, shuffle=False)
 
   train_X = np.array(x_train)
   test_X = np.array(x_test)
@@ -48,42 +48,6 @@ def create_window_set(df, column, window_size):
   test_X = test_X.reshape(test_X.shape[0],1,window_size,1)
 
   return train_X, train_Y, test_X, test_Y
-
-
-
-def create_window_set2(df, column, window_size):
-  X = []
-  Y = []
-
-  scaler = MinMaxScaler();
-  scaled = scaler.fit_transform(np.array((df.iloc[:,column])).reshape(-1,1))
-
-
-  for i in range(1 , len(df) - window_size -1 , 1):
-    first = scaled[i]
-    temp = []
-    temp2 = []
-    
-    for j in range(window_size):
-        temp.append(scaled[i + j])
-    
-    temp2.append(scaled[i + window_size])
-    
-    X.append(np.array(temp).reshape(window_size, 1))
-    Y.append(np.array(temp2).reshape(1, 1))
-  
-  x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.2, shuffle=False)
-
-  train_X = np.array(x_train)
-  test_X = np.array(x_test)
-  train_Y = np.array(y_train)
-  test_Y = np.array(y_test)
-
-  train_X = train_X.reshape(train_X.shape[0],1,window_size,1)
-  test_X = test_X.reshape(test_X.shape[0],1,window_size,1)
-
-  return scaler, train_X, train_Y, test_X, test_Y
-
 
 
 def build_model(window_size):
@@ -107,7 +71,7 @@ def build_model(window_size):
   return model
 
 
-def predict(model, data, column, scaled_X, scaled_Y):
+def predict(model, data, column, scaled_X, scaled_Y, size=0):
   train_predicted = model.predict(scaled_X)
   train_label = (scaled_Y[:, 0])
 
@@ -116,16 +80,20 @@ def predict(model, data, column, scaled_X, scaled_Y):
 
   train_predicted = np.array(train_predicted[:,0]).reshape(-1,1)
   len_t = len(scaled_X)
-  plt.figure(figsize=(18, 10))
+  
   for j in range(0, len_t):
       temp = data.iloc[j,column]
       X.append(train_predicted[j] * temp + temp)
       Y.append(train_label[j] * temp + temp)
-      
-  plt.plot(X, color = 'black', label = 'Predicted  Stock Price')
-  plt.plot(Y, color = 'green', label = 'Real Stock Price')
+
+  if(size > len(X)):
+    size = len(X) - 1
+  plt.figure(figsize=(18, 10))
+
+  plt.plot(X[-size:], color = 'black', label = 'Predicted  Stock Price')
+  plt.plot(Y[-size:], color = 'green', label = 'Real Stock Price')
   plt.title(' Stock Price Prediction')
   plt.xlabel('Time')
   plt.ylabel(' Stock Price')
   plt.legend()
-  plt.show()
+  plt.show() 

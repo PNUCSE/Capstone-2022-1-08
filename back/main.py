@@ -147,7 +147,7 @@ def cnn(co):
     data = fdr.DataReader(str(co), last_year)
     data = cnn_lstm.erase_zero(data)
     train_X, train_Y, test_X, test_Y = cnn_lstm.create_window_set(
-        data, column=3, window_size=50)
+        data, window_size=30)
     model = cnn_lstm.build_model(window_size=50)
     history = model.fit(train_X, train_Y, validation_data=(test_X, test_Y), epochs=3, batch_size=64, verbose=1,
                         shuffle=False)

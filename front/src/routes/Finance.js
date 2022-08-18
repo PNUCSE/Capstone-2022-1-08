@@ -3,7 +3,6 @@ import { useRecoilValue } from "recoil";
 import { stockCode } from "./Info";
 import ApexChart from "react-apexcharts";
 import ReactApexChart from "react-apexcharts";
-import MLtest from "./MLtest";
 import styled from "styled-components";
 import Article from "./Article";
 const Container = styled.div`
