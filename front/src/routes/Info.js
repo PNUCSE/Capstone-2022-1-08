@@ -49,13 +49,14 @@ const Test = styled.div`
     height:12%;
     margin:10px;
     font-weight: 400;
-    border-bottom:2px solid #E6E9ED;  
+    border-bottom:2px solid #E6E9ED;
+  }
 `
 const TestRow = styled.div`
     display:flex;
     width:100%;
     margin:20px;
-    align-item:center;
+    align-items:center;
     justify-content:space-between;
     span:first-child {
       font-size: 20px;
@@ -85,7 +86,6 @@ const Title = styled.h1`
 const Header = styled.header`
   height: 5vh;
   display: flex;
-  justify-content: ;
   align-items: center;
   background-color:white;
   margin-bottom:7px;
@@ -109,31 +109,9 @@ const OverviewItem = styled.div`
     margin-bottom: 5px;
   }
 `;
-const Tabs = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  margin: 25px 0px;
-  gap: 10px;
-`;
 
-const Tab = styled.span`
-  text-align: center;
-  text-transform: uppercase;
-  font-size: 12px;
-  font-weight: 400;
-  background-color: white;
-  padding: 7px 0px;
-  border-radius: 10px;
-  color: ${(props) =>
-    props.isActive ? props.theme.accentColor : props.theme.textColor};
-  a {
-    display: block;
-  }
-`;
 
-const Description = styled.p`
-  margin: 20px 0px;
-`;
+
 export const stockCode= atom({
   key:'stockCode',
   default:''
@@ -249,10 +227,10 @@ function Info() {
                     lines: {
                         show: false
                     }
-                  },   
+                },   
                 },
-                dataLabels: {
-                  enabled: false
+                 dataLabels: {
+                    enabled: false
                 },
                 stroke: {
                   curve: "smooth",
@@ -295,7 +273,7 @@ function Info() {
           </Chart>
           <Row>
             <Finance/>
-            <Trend/>
+            {<Trend/>}
           </Row>
           <Row>
             <Ifrs/>
@@ -305,7 +283,7 @@ function Info() {
         </>
       )}
       
-      
+
     </Container>
   );
 }

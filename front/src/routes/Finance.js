@@ -4,13 +4,14 @@ import { stockCode } from "./Info";
 import ApexChart from "react-apexcharts";
 import ReactApexChart from "react-apexcharts";
 import styled from "styled-components";
-import Article from "./Article";
+import Article, { Header } from "./Article";
 const Container = styled.div`
   margin:10px 0px;  
   background-color:white;
   box-sizing: border-box;
+  padding:15px;
   height:420px;
-  width:30%;
+  width:33%;
   display:inline-block;
 `
 function Finance() {
@@ -27,12 +28,13 @@ function Finance() {
   },[])
   return (
     <Container>
+      <Header>유사 업종 비교</Header>
       {/* 기업명 */}
       {/* {Object.keys(data)}  */}
       {/* '배당성향','유동성','건전성','수익성','성장성' */}
       {/* {data[Object.keys(data)]} */}
       <ReactApexChart 
-        height="100%"
+        height="90%"
         width="100%"     
         type="radar"  
         series={relate?.map(elem=>(
