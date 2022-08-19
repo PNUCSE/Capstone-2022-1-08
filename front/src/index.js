@@ -7,8 +7,8 @@ import { ReactQueryDevtools } from "react-query/devtools";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 const queryClient = new QueryClient();
 const darkTheme = {
-  bgColor: "whitesmoke",
-  textColor: "#111",
+  bgColor: "#F7F7F7",
+  textColor: "#73879c",
   accentColor: "#9c88ff",
 };
 const lightTheme = {

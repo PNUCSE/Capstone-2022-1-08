@@ -7,24 +7,44 @@ export const Container = styled.div`
   margin: 10px 0px;
   background-color:white;
   box-sizing: border-box;
-  padding: 10px;
+  padding: 15px;
   width:33%;
+  border: 1px solid #E6E9ED;
 `;
 
-const Header = styled.header`
+export const Header = styled.header`
   margin-bottom: 10px;
   padding-bottom: 10px;
-  font-size: 30px;
-  border-bottom: 2px solid;
+  font-size: 17px;
+  font-weight:700;
+  border-bottom: 2px solid #E6E9ED;
 `;
-
-const Title = styled.a`
-  color: #c8c8ff;
-  font-size: 25px;
-  div {
+const Block = styled.div`
+  margin:0;
+  border-left:3px solid #e8e8e8;
+  padding:10px 15px;
+`
+const Title = styled.div`
+  font-size: 16px;
+  font-weight:400;
+  p {
     margin-bottom: 1px;
     margin-top: 5px;
   }
+  div{
+    content: "";
+    display: block;
+    width: 14px;
+    height: 14px;
+    position:relative;
+    left:-23px;
+    top:22px;
+    border: 3px solid #d2d3d2;
+    border-radius: 14px;
+    background: #f9f9f9;
+  }
+  
+
 `;
 const Off = styled.div`
   color: #aab6aa;
@@ -52,14 +72,15 @@ function Article() {
       <Header>관련기사</Header>
 
       {article?.map((item) => (
-        <>
+        <Block>
           <Title href={item.url}>
-            <div>{item.title}</div>
+            <div></div>
+            <p>{item.title}</p>
           </Title>
           <Off>{item.offname}</Off>
           <Date>{item.rdate}</Date>
           <p>{item.content}</p>
-        </>
+        </Block>
       ))}
     </Container>
   );

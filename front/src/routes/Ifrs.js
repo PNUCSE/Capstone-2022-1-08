@@ -2,11 +2,11 @@ import { useRecoilValue } from "recoil";
 import { stockCode } from "./Info";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import {Container} from "./Article"
+import {Container,Header} from "./Article"
 const Td = styled.td`
     text-align:right;
     padding:5px;
-    border-bottom:0.3px solid grey;
+    border-bottom:1px solid #E6E9ED;
     color: #73879C;
 `
 const Th = styled.th`
@@ -30,6 +30,9 @@ function Ifrs(){
       console.log(ifrs)
     return (
         <Container>
+            <Header>
+                재무제표 Net Quarter (단위: 억원)
+            </Header>
             <table>
                 <thead>
                 <tr>

@@ -15,7 +15,6 @@ import Finance from "./Finance";
 import Article from "./Article";
 import { atom, useRecoilState } from "recoil";
 import Trend from "./Trend";
-
 import Ifrs from "./Ifrs";
 
 const StyledButton = styled.button`
@@ -50,7 +49,6 @@ const Test = styled.div`
     height:12%;
     margin:10px;
     font-weight: 400;
-    color:${(props) => props.theme.accentColor};
     border-bottom:2px solid #E6E9ED;  
 `
 const TestRow = styled.div`
@@ -61,13 +59,11 @@ const TestRow = styled.div`
     justify-content:space-between;
     span:first-child {
       font-size: 20px;
-      color:${(props) => props.theme.accentColor};
       font-weight: 400;
       text-transform: uppercase;
       margin-bottom: 5px;
     }
     span:not(:first-child){
-      color:#73879C;
       font-size:20px;
     }
 `
@@ -82,13 +78,8 @@ const Loader = styled.span`
 `;
 
 const Title = styled.h1`
-  color: ${(props) => props.theme.accentColor};
-<<<<<<< HEAD
   font-size: 25px;
   font-weight:500;
-=======
-  font-size: 50px;
->>>>>>> e900a398cf0aaddcd77ab5e38033945bc775bedc
 `;
 
 const Header = styled.header`
@@ -224,7 +215,7 @@ function Info() {
             <ApexChart 
               height="70%"
               width="300%"
-              type="line"
+              type="area"
               series={[
                 {
                   name: "sales",
@@ -253,6 +244,15 @@ function Info() {
                 },
                 grid: {
                   show: true,
+                  //y축 선 
+                  yaxis: {
+                    lines: {
+                        show: false
+                    }
+                  },   
+                },
+                dataLabels: {
+                  enabled: false
                 },
                 stroke: {
                   curve: "smooth",
@@ -263,7 +263,7 @@ function Info() {
                   categories: stockData?.map((price) => price.날짜),
                   labels: {
                     style: {
-                      colors: "#9c88ff",
+                      
                     },
                     
                   },
@@ -293,29 +293,19 @@ function Info() {
               </TestRow>
             </Test>
           </Chart>
-          {/* <Tabs>
-            <Tab isActive={financeMatch !== null}>
-              <Link to="finance" state={{ name }}>
-                finance
-              </Link>
-            </Tab>
-            <Tab isActive={articleMatch !== null}>
-              <Link to="article" state={{ name }}>
-                Article
-              </Link>
-            </Tab>
-          </Tabs> */}
           <Row>
             <Finance/>
+            <Trend/>
+          </Row>
+          <Row>
             <Ifrs/>
             <Article/>
           </Row>
-          
           <Outlet />
         </>
       )}
       
-      {/* <Trend/> */}
+      
     </Container>
   );
 }
