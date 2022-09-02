@@ -305,14 +305,6 @@ def crawl_ifrs(co='005930'):
         ifrs.iloc[23:24, i] = ifrs.iloc[23:24, i].apply(lambda x: x[:-2])
     ifrs = ifrs.replace(['9,999,999,999', '9,999,999,999.0'], ['-', '-'])
     ifrs=ifrs.to_json(orient='split',force_ascii=False)
-    # ifrs = ifrs.to_html(justify="right", index=False, classes="table")
-    # ifrs = ifrs.replace('border="1"', 'border="0"')
-    # pd.options.display.float_format = '{:,.0f}'.format
-    # ifrs = ifrs.replace('<td>', '<td align="right">')
-    # ifrs = ifrs.replace('<th>', '<th style="text-align: right;">')
-    # ifrs = ifrs.replace('halign="left"', 'style="text-align: center;"')
-    # ifrs = ifrs.replace('class ="dataframe table"',
-    #                     'class ="dataframe table" style = "table-layout:fixed;word-break:break-all;"')
     print(ifrs)
     return ifrs; 
 
@@ -322,12 +314,12 @@ def crawl_ifrs(co='005930'):
 def invest_opinion(co):
     url='https://finance.naver.com/item/coinfo.naver?code='+co
     page = pd.read_html(url,encoding='CP949')
-    print(page[3][1].tolist()[0][:4].split('-'))
+    print(page[3][1].tolist()[0][:4].split('.'))
     try:
-        a,b=page[3][1].tolist()[0][:4].split('-')
+        a,b=page[3][1].tolist()[0][:4].split('.')
         print(a,b)
         return {"data":((int(a)+int(b)/100)/5)*100}
     except ValueError:
-        return {"data":0.1}
+        return {"data":0}
 if __name__ == '__main__':
     app.run(debug=False)

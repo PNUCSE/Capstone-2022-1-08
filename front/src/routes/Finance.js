@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { stockCode } from "./Info";
-import ApexChart from "react-apexcharts";
 import ReactApexChart from "react-apexcharts";
 import styled from "styled-components";
 import Article, { Header } from "./Article";

@@ -16,6 +16,7 @@ import Article from "./Article";
 import { atom, useRecoilState } from "recoil";
 import Trend from "./Trend";
 import Ifrs from "./Ifrs";
+import Opinion from "./Opinion";
 
 const StyledButton = styled.button`
   padding: 6px 12px;
@@ -273,7 +274,8 @@ function Info() {
           </Chart>
           <Row>
             <Finance/>
-            {<Trend/>}
+            <Trend/>
+            <Opinion/>
           </Row>
           <Row>
             <Ifrs/>
