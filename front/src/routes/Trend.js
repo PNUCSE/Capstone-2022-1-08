@@ -2,6 +2,19 @@ import { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { stockCode } from "./Info";
 import ApexChart from "react-apexcharts";
+import styled from "styled-components";
+import { Header } from "./Article";
+const Container = styled.div`
+  margin:10px 0px;  
+  padding:15px; 
+  background-color:white;
+  box-sizing: border-box;
+  height:420px;
+  width:33%;
+  display:inline-block;
+  border: 1px solid #E6E9ED;
+`
+
 function Trend(){
     const code = useRecoilValue(stockCode);
     const [trend,setTrend] = useState();
@@ -15,9 +28,12 @@ function Trend(){
     },[])
     console.log(trend);
     return(
-        <div>
+        <Container>
+            <Header>검색어 트렌드</Header>
             <ApexChart
-              type="line"
+              height="80%"
+              width="100%"  
+              type="area"
               series={[
                 {
                   name: "trend",
@@ -36,23 +52,34 @@ function Trend(){
                 },
                 grid: {
                   show: true,
+                  yaxis:{
+                    lines: {
+                      show: false
+                    }
+                  }
                 },
+                fill:{
+                  colors:['#2E93fA', '#66DA26', '#546E7A', '#E91E63', '#FF9800'],
+                },
+                dataLabels: {
+                  enabled: false
+                },               
                 stroke: {
                   curve: "smooth",
-                  width: 3,
+                  width: 2,
                 },
                 xaxis: {
                   type: "datetime",
                   categories: trend?.map((data) => data.period),
                   labels: {
                     style: {
-                      colors: "#9c88ff",
+                      
                     },
                   },
                 },
               }}
             />
-        </div>
+        </Container>
     )
 }
 export default Trend;

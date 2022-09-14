@@ -15,6 +15,8 @@ import Finance from "./Finance";
 import Article from "./Article";
 import { atom, useRecoilState } from "recoil";
 import Trend from "./Trend";
+import Ifrs from "./Ifrs";
+import Opinion from "./Opinion";
 
 const StyledButton = styled.button`
   padding: 6px 12px;
@@ -28,32 +30,72 @@ const StyledButton = styled.button`
 
 const Container = styled.div`
   padding: 0px 20px;
-  max-width: 1000px;
-  margin: 0 auto;
 `;
-
+const Chart = styled.div`
+  background-color:white;
+  height:420px;
+  width:100%;
+  display:flex;
+  margin-bottom:10px;
+`
+const Test = styled.div`
+  margin-left: 10px;
+  margin-right:10px;
+  display:flex;
+  width:30%;
+  align-items: center;
+  flex-direction: column;
+  >span{
+    font-size: 30px;
+    height:12%;
+    margin:10px;
+    font-weight: 400;
+    border-bottom:2px solid #E6E9ED;
+  }
+`
+const TestRow = styled.div`
+    display:flex;
+    width:100%;
+    margin:20px;
+    align-items:center;
+    justify-content:space-between;
+    span:first-child {
+      font-size: 20px;
+      font-weight: 400;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+    span:not(:first-child){
+      font-size:20px;
+    }
+`
+// 두번째줄부터
+const Row = styled.div`
+  display:flex;
+  justify-content:space-between;
+`
 const Loader = styled.span`
   text-align: center;
   display: block;
 `;
 
 const Title = styled.h1`
-  color: ${(props) => props.theme.accentColor};
-  font-size: 50px;
+  font-size: 25px;
+  font-weight:500;
 `;
 
 const Header = styled.header`
-  height: 10vh;
+  height: 5vh;
   display: flex;
-  justify-content: center;
   align-items: center;
+  background-color:white;
+  margin-bottom:7px;
+  padding-left:15px;
 `;
 
 const Overview = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  background-color:white;
   padding: 10px 20px;
   border-radius: 10px;
 `;
@@ -68,31 +110,9 @@ const OverviewItem = styled.div`
     margin-bottom: 5px;
   }
 `;
-const Tabs = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  margin: 25px 0px;
-  gap: 10px;
-`;
 
-const Tab = styled.span`
-  text-align: center;
-  text-transform: uppercase;
-  font-size: 12px;
-  font-weight: 400;
-  background-color: white;
-  padding: 7px 0px;
-  border-radius: 10px;
-  color: ${(props) =>
-    props.isActive ? props.theme.accentColor : props.theme.textColor};
-  a {
-    display: block;
-  }
-`;
 
-const Description = styled.p`
-  margin: 20px 0px;
-`;
+
 export const stockCode= atom({
   key:'stockCode',
   default:''
@@ -110,8 +130,6 @@ function Info() {
   const [updown, setUpdown] = useState([[]]);
   const [relate, setRelate] = useState([]);
   const [predict,setPredict]=useState([{}]); //예측가격
-  const articleMatch = useMatch("/:stockId/article");
-  const financeMatch = useMatch("/:stockId/finance");
 
   useEffect(() => {
     // 종목 가격 불러오기 1.날짜 2.시가 3.고가 4.저가 5.종가
@@ -150,11 +168,7 @@ function Info() {
         <>
           <Overview>
             <OverviewItem>
-              <span>종목코드:</span>
-              <span>{stockId}</span>
-            </OverviewItem>
-            <OverviewItem>
-              <span>현재가:</span>
+              <span>{name}</span>
               {/* 최신날짜 종가 */}
               <span>{stockData[stockData.length - 1].종가}</span>
               <span>
@@ -173,10 +187,14 @@ function Info() {
               </span>
             </OverviewItem>
           </Overview>
-
-          <div>
-            <ApexChart
-              type="line"
+          <Header>
+              <Title>{name} 주가 차트</Title>
+          </Header>
+          <Chart>
+            <ApexChart 
+              height="70%"
+              width="300%"
+              type="area"
               series={[
                 {
                   name: "sales",
@@ -191,47 +209,83 @@ function Info() {
                 theme: {
                   mode:"light"
                 },
+                tooltip: {
+                  y: {
+                    formatter: (value) => `$${value.toFixed(2)}`,
+                  },
+                },
                 chart: {
                   toolbar: {
                     show: false,
                   },
-                  height: 500,
+            
+                 
                 },
                 grid: {
                   show: true,
+                  //y축 선 
+                  yaxis: {
+                    lines: {
+                        show: false
+                    }
+                },   
+                },
+                 dataLabels: {
+                    enabled: false
                 },
                 stroke: {
                   curve: "smooth",
-                  width: 3,
+                  width: 2,
                 },
                 xaxis: {
                   type: "datetime",
                   categories: stockData?.map((price) => price.날짜),
                   labels: {
                     style: {
-                      colors: "#9c88ff",
+                      
                     },
+                    
                   },
                 },
+                yaxis:{
+                  floating:false,
+                  decimalsInFloat: undefined,
+                  labels:{
+                    formatter:(value) => `$${value.toFixed(0)}`,
+                  }
+                }
               }}
             />
-          </div>
-          <Tabs>
-            <Tab isActive={financeMatch !== null}>
-              <Link to="finance" state={{ name }}>
-                finance
-              </Link>
-            </Tab>
-            <Tab isActive={articleMatch !== null}>
-              <Link to="article" state={{ name }}>
-                Article
-              </Link>
-            </Tab>
-          </Tabs>
+            <Test>
+              <span>다음 장날 주가 예측</span>
+              <TestRow>
+                <span>{name} 고가</span>
+                <span>\가격</span>
+              </TestRow>
+              <TestRow>
+                <span>{name} 저가</span>
+                <span>\가격</span>
+              </TestRow>
+              <TestRow>
+                <span>{name} 종가</span>
+                <span>\가격</span>
+              </TestRow>
+            </Test>
+          </Chart>
+          <Row>
+            <Finance/>
+            <Trend/>
+            <Opinion/>
+          </Row>
+          <Row>
+            <Ifrs/>
+            <Article/>
+          </Row>
           <Outlet />
         </>
       )}
-      <Trend/>
+      
+
     </Container>
   );
 }

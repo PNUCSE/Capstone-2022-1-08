@@ -1,9 +1,18 @@
 import { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { stockCode } from "./Info";
-import ApexChart from "react-apexcharts";
 import ReactApexChart from "react-apexcharts";
-
+import styled from "styled-components";
+import Article, { Header } from "./Article";
+const Container = styled.div`
+  margin:10px 0px;  
+  background-color:white;
+  box-sizing: border-box;
+  padding:15px;
+  height:420px;
+  width:33%;
+  display:inline-block;
+`
 function Finance() {
   // 유사업종비교
   const code = useRecoilValue(stockCode);
@@ -17,13 +26,16 @@ function Finance() {
     })();
   },[])
   return (
-    <div>
+    <Container>
+      <Header>유사 업종 비교</Header>
       {/* 기업명 */}
       {/* {Object.keys(data)}  */}
       {/* '배당성향','유동성','건전성','수익성','성장성' */}
       {/* {data[Object.keys(data)]} */}
-      <ReactApexChart
-        type="radar"
+      <ReactApexChart 
+        height="90%"
+        width="100%"     
+        type="radar"  
         series={relate?.map(elem=>(
           {
             name:Object.keys(elem),
@@ -35,8 +47,7 @@ function Finance() {
           theme: {
             mode: "light",
           },
-          chart: {
-            height: 350,
+          chart: {        
             type: 'radar',
             dropShadow: {
               enabled: true,
@@ -61,7 +72,7 @@ function Finance() {
         }}
         
       />
-    </div>
+    </Container>
   );
 }
 

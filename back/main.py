@@ -15,15 +15,12 @@ import re
 import os
 import sys
 import urllib.request
+
+#네이버 API KEY
 client_id = "vXyRpnX778p3HV9msFsS"
 client_secret = "MvxaxQ9bw8"
-code="005930"
 # 검색어 트렌드 주소
 url = "https://openapi.naver.com/v1/datalab/search"; 
-# body = "{\"startDate\":\"2017-01-01\",\"endDate\":\"2017-04-30\",\"timeUnit\":\"month\",\"keywordGroups\":[{\"groupName\":\"한글\",\"keywords\":[\]},{\"groupName\":\"영어\",\"keywords\":[\"영어\",\"english\"]}],\"device\":\"pc\",\"ages\":[\"1\",\"2\"],\"gender\":\"f\"}";
-
-
-# body = urllib.parse.urlencode(body)
 app = Flask(__name__)
 today = datetime.today().strftime("%Y%m%d")
 last_year = (datetime.today()-timedelta(365)).strftime("%Y%m%d")
@@ -46,7 +43,6 @@ def relate_code_crawl(co):
         codes.append(word[-6:])
 
     return codes
-
 
 def fn_craw(stock_code='005930'):
     """
@@ -72,7 +68,7 @@ def fn_craw(stock_code='005930'):
     url = f"https://finance.naver.com/item/main.naver?code={gcode}"
     table_list = pd.read_html(url, encoding='euc-kr')
 
-    # print(table_list[3]['최근 연간 실적'].iloc[:,2])
+    #print(table_list[3]['최근 연간 실적'].iloc[:,2])
 
     return table_list
 # 전일 대비 등락률
@@ -158,6 +154,7 @@ def cnn(co):
     df = cnn_lstm.predict(model, data[len(train_X):], 3, test_X, test_Y)
     df = np.array(df).ravel().tolist()
     print(df)
+    
     return jsonify({'data': df})
 
 
@@ -287,5 +284,42 @@ def trend(co):
         print("Error Code:" + rescode)
     return response_body
 
+#----2022-08-16-----
+@app.route('/api/ifrs/<co>')
+def crawl_ifrs(co='005930'):
+    url = "http://comp.fnguide.com/SVO2/ASP/SVD_Main.asp?pGB=1&gicode=A"+co+"&cID=&MenuYn=Y&ReportGB=&NewMenuID=11&stkGb=701"
+    table_list = pd.read_html(url, encoding='UTF-8')
+
+    ifrs = table_list[10]
+    ifrs = ifrs.fillna('9999999999')
+    for i in range(1, 5):
+        if ifrs.iloc[:, i].dtype == 'O':
+            ifrs.iloc[:, i] = ifrs.iloc[:, i].apply(lambda x: '9999999999' if type(x) == str else x)
+            ifrs.iloc[:, i] = ifrs.iloc[:, i].astype('float')
+        ifrs.iloc[:, i] = ifrs.iloc[:, i].apply(lambda x: format(float(x), ','))
+    ifrs = pd.concat([ifrs.iloc[:, 0], ifrs['Annual']], axis=1)
+    ifrs = ifrs.astype(str)
+    for i in range(1, 5):
+        ifrs.iloc[:12, i] = ifrs.iloc[:12, i].apply(lambda x: x[:-2])
+        ifrs.iloc[18:21, i] = ifrs.iloc[18:21, i].apply(lambda x: x[:-2])
+        ifrs.iloc[23:24, i] = ifrs.iloc[23:24, i].apply(lambda x: x[:-2])
+    ifrs = ifrs.replace(['9,999,999,999', '9,999,999,999.0'], ['-', '-'])
+    ifrs=ifrs.to_json(orient='split',force_ascii=False)
+    print(ifrs)
+    return ifrs; 
+
+#----2022-08-18-----
+#투자의견
+@app.route('/api/invest_opinion/<co>')
+def invest_opinion(co):
+    url='https://finance.naver.com/item/coinfo.naver?code='+co
+    page = pd.read_html(url,encoding='CP949')
+    print(page[3][1].tolist()[0][:4].split('.'))
+    try:
+        a,b=page[3][1].tolist()[0][:4].split('.')
+        print(a,b)
+        return {"data":((int(a)+int(b)/100)/5)*100}
+    except ValueError:
+        return {"data":0}
 if __name__ == '__main__':
     app.run(debug=False)

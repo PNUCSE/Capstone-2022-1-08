@@ -7,6 +7,7 @@ import {
   useRecoilState,
   useRecoilValue,
 } from 'recoil';
+import "@fontsource/source-sans-pro";
 const GlobalStyle = createGlobalStyle`
 @import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400&display=swap');
 font-family: 'Source Sans Pro', sans-serif;
