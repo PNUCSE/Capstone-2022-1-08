@@ -2,7 +2,9 @@ import { useRecoilValue } from "recoil";
 import { stockCode } from "./Info";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
+import axios from 'axios';
 import {Container,Header} from "./Article"
+import { useQuery } from "react-query";
 const Td = styled.td`
     text-align:right;
     padding:5px;
@@ -19,15 +21,10 @@ const Th = styled.th`
 // 재무제표
 function Ifrs(){
     const code = useRecoilValue(stockCode);
-    const [ifrs,setIfrs]= useState();
-    useEffect(()=>{
-        (async()=>{
-          const response=await fetch(`/api/ifrs/${code}`);
-          const json=await response.json();
-          setIfrs(json.data);
-        })();
-      },[])
-      console.log(ifrs)
+    const fetchIfrs = () => {
+        return axios.get(`/api/ifrs/${code}`);
+    }
+    const {data,isLoading} = useQuery('ifrs',fetchIfrs);
     return (
         <Container>
             <Header>
@@ -44,7 +41,7 @@ function Ifrs(){
                 </tr>
                 </thead> 
                 <tbody>
-                    {ifrs?.map((data)=>(
+                    {data?.data.data.map((data)=>(
                         <tr>
                             <Td>{data[0]}</Td>
                             <Td>{data[1]}</Td>

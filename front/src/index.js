@@ -21,6 +21,7 @@ root.render(
       <ThemeProvider theme={darkTheme}>
         <App />
       </ThemeProvider>
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   </React.StrictMode>
 );

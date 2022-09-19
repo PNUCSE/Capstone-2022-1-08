@@ -170,7 +170,7 @@ function Info() {
             <OverviewItem>
               <span>{name}</span>
               {/* 최신날짜 종가 */}
-              <span>{stockData[stockData.length - 1].종가}</span>
+              <span>{stockData[stockData?.length - 1].종가}</span>
               <span>
                 {updown[0][0].substr(0, 2) === "상향" ? (
                   <p style={{ color: "red" }}> +{updown[0][0].substr(3)}</p>
@@ -211,7 +211,7 @@ function Info() {
                 },
                 tooltip: {
                   y: {
-                    formatter: (value) => `$${value.toFixed(2)}`,
+                    formatter: (value) => `$${value}`,
                   },
                 },
                 chart: {
