@@ -8,13 +8,15 @@ import time
 import pandas as pd
 from pykrx import stock
 import json
-import cnn_lstm_conv1d as cnn_lstm
+import model
 import numpy as np
 import FinanceDataReader as fdr
 import re
 import os
 import sys
 import urllib.request
+import tensorflow as tf
+import distiller as dstl
 
 #네이버 API KEY
 client_id = "vXyRpnX778p3HV9msFsS"
@@ -24,6 +26,11 @@ url = "https://openapi.naver.com/v1/datalab/search";
 app = Flask(__name__)
 today = datetime.today().strftime("%Y%m%d")
 last_year = (datetime.today()-timedelta(365)).strftime("%Y%m%d")
+
+PATH = os.path.dirname(os.path.realpath(__file__))
+DATA_PATH = PATH + '\\data\\'
+WEIGHT_PATH = PATH + '\\weight\\'
+MODEL_PATH = PATH + '\\model'
 
 # -------- 코드를 기업이름으로 변환
 def stc_code_to_nm(stock_code):
@@ -144,18 +151,44 @@ def article(co):
 
 @app.route('/api/cnn/<co>')
 def cnn(co):
-    data = fdr.DataReader(str(co), last_year)
-    data = cnn_lstm.erase_zero(data)
-    train_X, train_Y, test_X, test_Y = cnn_lstm.create_window_set(
-        data, window_size=30)
-    model = cnn_lstm.build_model(window_size=50)
-    history = model.fit(train_X, train_Y, validation_data=(test_X, test_Y), epochs=3, batch_size=64, verbose=1,
-                        shuffle=False)
-    df = cnn_lstm.predict(model, data[len(train_X):], 3, test_X, test_Y)
-    df = np.array(df).ravel().tolist()
-    print(df)
+    batch = 32
+    window = 30
+    d_k = 256
+    d_v = 256
+    n_heads = 12
+    ff_dim = 256
     
-    return jsonify({'data': df})
+    col_label = model.col_label 
+    col_feature = model.col_feature
+
+    df = fdr.DataReader(str(co), last_year)
+    data_with_date = model.preprocessing(df, last_year)
+    data = data_with_date.iloc[:, 1:]
+    train_X, train_Y, test_X, test_Y = model.create_window_set(
+        data, window, col_feature, col_label, tf=True, shuffle=True
+    )
+    teacher = tf.keras.models.load_model(MODEL_PATH)
+    student = model.cnn_categorical(window, len(col_feature))
+
+    distiller = dstl.Distiller(student=student, teacher=teacher)
+    distiller.compile(
+        optimizer=tf.keras.optimizers.Adam(),
+        metrics=[tf.keras.metrics.CategoricalAccuracy()],
+        student_loss_fn=tf.keras.losses.CategoricalCrossentropy(),
+        distillation_loss_fn=tf.keras.losses.KLDivergence(),
+        alpha=0.1,
+        temperature=10,
+    )
+
+    history = distiller.fit(train_X, train_Y,validation_data=(test_X, test_Y), batch_size=batch, epochs=15)
+
+    last_data = data.tail(30)[col_feature].to_numpy()
+    predicted = distiller.student(
+        last_data.reshape((1, last_data.shape[0], last_data.shape[1]))
+    )
+    label = predicted.numpy().reshape(-1).argmax().astype(float)
+    
+    return jsonify({'predict': label})
 
 
 #----2022-08-05------
