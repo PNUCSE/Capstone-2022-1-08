@@ -21,7 +21,11 @@ function Finance() {
   const fetchRelate = () => {
     return axios.get(`/api/relate_data/${code}`);
   }
-  const {data,isLoading} = useQuery('relate',fetchRelate);
+  const {data,isLoading} = useQuery('relate',fetchRelate,{
+    //3초간 캐시에저장
+    staleTime: 3000,
+
+  });
   const [test,setTest]= useState();
 
   return (

@@ -485,6 +485,6 @@ def relate_radar_weather_data(co):
     weather_list[:, 4] = (weather_list[:, 4] / weather_list[:, 4].mean())  # 각 기업의 평균 대비 BPS
     weather_list=np.round(weather_list, 2)
     print(label_list, radar_dict_list, weather_list[0], foreign_ms, giguan_ms)
-    return "hi"
+    return jsonify({"weather":weather_list[0].tolist(),"foreign":foreign_ms,"giguan":giguan_ms})
 if __name__ == '__main__':
     app.run(debug=False)
