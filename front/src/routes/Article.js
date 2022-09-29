@@ -3,6 +3,8 @@ import { useLocation } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import styled from "styled-components";
 import { stockCode } from "./Info";
+import axios from 'axios';
+import { useQuery } from "react-query";
 export const Container = styled.div`
   margin: 10px 0px;
   background-color:white;
@@ -56,22 +58,18 @@ const Date = styled.span`
   color: #aab6aa;
   font-size: 0.9375em;
 `;
+
 function Article() {
   const code = useRecoilValue(stockCode);
-  const [article, setArticle] = useState([{}]);
-  useEffect(() => {
-    (async () => {
-      const response = await fetch(`/api/article/${code}`);
-      const json = await response.json();
-      setArticle(json);
-    })();
-  }, []);
-
+  const fetchArticle = () => {
+    return axios.get(`/api/article/${code}`);
+  }
+  const {data,isLoading} = useQuery('article',fetchArticle);
   return (
     <Container>
       <Header>관련기사</Header>
 
-      {article?.map((item) => (
+      {data?.data.map((item) => (
         <Block>
           <Title href={item.url}>
             <div></div>

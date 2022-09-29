@@ -17,6 +17,8 @@ import { atom, useRecoilState } from "recoil";
 import Trend from "./Trend";
 import Ifrs from "./Ifrs";
 import Opinion from "./Opinion";
+import Invest from "./Invest";
+
 
 const StyledButton = styled.button`
   padding: 6px 12px;
@@ -129,7 +131,7 @@ function Info() {
   const [stockData, setstockData] = useState([{}]); //날짜별 가격
   const [updown, setUpdown] = useState([[]]);
   const [relate, setRelate] = useState([]);
-  const [predict,setPredict]=useState([{}]); //예측가격
+  const [predict,setPredict]=useState(); //예측가격
 
   useEffect(() => {
     // 종목 가격 불러오기 1.날짜 2.시가 3.고가 4.저가 5.종가
@@ -144,7 +146,7 @@ function Info() {
       const updownJson = await updownResponse.json();
       const predResponse = await fetch(`/api/cnn/${stockId}`);
       const predJson = await predResponse.json();
-      setPredict(predJson.data)
+      setPredict(predJson.predict);
       setUpdown(updownJson.data);
       setLoading(false);
     })();
@@ -170,7 +172,7 @@ function Info() {
             <OverviewItem>
               <span>{name}</span>
               {/* 최신날짜 종가 */}
-              <span>{stockData[stockData.length - 1].종가}</span>
+              <span>{stockData[stockData?.length - 1].종가}</span>
               <span>
                 {updown[0][0].substr(0, 2) === "상향" ? (
                   <p style={{ color: "red" }}> +{updown[0][0].substr(3)}</p>
@@ -200,10 +202,6 @@ function Info() {
                   name: "sales",
                   data: stockData?.map((price) => price.종가),
                 },
-                {
-                  name: "predict",
-                  data: predict?.map((price)=>price)
-                }
               ]}
               options={{
                 theme: {
@@ -211,7 +209,7 @@ function Info() {
                 },
                 tooltip: {
                   y: {
-                    formatter: (value) => `$${value.toFixed(2)}`,
+                    formatter: (value) => `$${value}`,
                   },
                 },
                 chart: {
@@ -258,18 +256,9 @@ function Info() {
             />
             <Test>
               <span>다음 장날 주가 예측</span>
-              <TestRow>
-                <span>{name} 고가</span>
-                <span>\가격</span>
-              </TestRow>
-              <TestRow>
-                <span>{name} 저가</span>
-                <span>\가격</span>
-              </TestRow>
-              <TestRow>
-                <span>{name} 종가</span>
-                <span>\가격</span>
-              </TestRow>
+              {predict==0?(
+                <span style={{ color: "blue" }}>하락</span>
+              ):predict==1?<span>유지</span>:<span style={{ color: "red" }}>상승</span>}
             </Test>
           </Chart>
           <Row>
@@ -280,6 +269,7 @@ function Info() {
           <Row>
             <Ifrs/>
             <Article/>
+            <Invest/>
           </Row>
           <Outlet />
         </>

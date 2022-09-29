@@ -4,6 +4,8 @@ import { stockCode } from "./Info";
 import ReactApexChart from "react-apexcharts";
 import styled from "styled-components";
 import Article, { Header } from "./Article";
+import axios from 'axios';
+import { useQuery } from "react-query";
 const Container = styled.div`
   margin:10px 0px;  
   background-color:white;
@@ -16,15 +18,12 @@ const Container = styled.div`
 function Finance() {
   // 유사업종비교
   const code = useRecoilValue(stockCode);
-  const [relate,setRelate]= useState([{}]);
-  useEffect(()=>{
-    (async()=>{
-      const response=await fetch(`/api/relate_data/${code}`);
-      const json=await response.json();
-      console.log(json)
-      setRelate(json);
-    })();
-  },[])
+  const fetchRelate = () => {
+    return axios.get(`/api/relate_data/${code}`);
+  }
+  const {data,isLoading} = useQuery('relate',fetchRelate);
+  const [test,setTest]= useState();
+
   return (
     <Container>
       <Header>유사 업종 비교</Header>
@@ -32,11 +31,11 @@ function Finance() {
       {/* {Object.keys(data)}  */}
       {/* '배당성향','유동성','건전성','수익성','성장성' */}
       {/* {data[Object.keys(data)]} */}
-      <ReactApexChart 
+      {isLoading?<div>loading..</div>:<ReactApexChart 
         height="90%"
         width="100%"     
         type="radar"  
-        series={relate?.map(elem=>(
+        series={data?.data?.map(elem=>(
           {
             name:Object.keys(elem),
             data:elem[Object.keys(elem)]
@@ -72,6 +71,11 @@ function Finance() {
         }}
         
       />
+      
+    
+    
+      }
+      
     </Container>
   );
 }

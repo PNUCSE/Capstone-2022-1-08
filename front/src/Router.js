@@ -9,8 +9,6 @@ function Router() {
       <Routes>
         <Route path="/" element={<Stocks />}></Route>
         <Route path="/:stockId/" element={<Info />}>
-          {/* <Route path="finance" element={<Finance />} />
-          <Route path="article" element={<Article />} /> */}
         </Route>
       </Routes>
     </BrowserRouter>
