@@ -4,16 +4,14 @@ import App from "./App";
 import { ThemeProvider } from "styled-components";
 import { Query, QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
+import "./fonts/font.css"
 const root = ReactDOM.createRoot(document.getElementById("root"));
 const queryClient = new QueryClient();
 const darkTheme = {
   bgColor: "#F7F7F7",
   textColor: "#73879c",
   accentColor: "#9c88ff",
-};
-const lightTheme = {
-  textColor: "#f5f6fa",
-  backgroundColor: "#2f3640",
+  fontFamily: "NanumGothic",
 };
 root.render(
   <React.StrictMode>

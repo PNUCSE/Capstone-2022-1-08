@@ -40,14 +40,14 @@ function Invest(){
                          외국인매매 주식
                     </BoxHead>   
                     {data.data.foreign}
-                    <FaCloudRain size={50}/>
+                    {data.data.foreign>0?<FaSun size={50}/>:<FaCloudRain size={50}/>}                 
                 </Box>    
                 <Box>
                     <BoxHead>
                         기관매매 주식
                     </BoxHead>    
                     {data.data.giguan} 
-                    <FaCloudRain size={50}/>     
+                    {data.data.giguan>0?<FaSun size={50}/>:<FaCloudRain size={50}/>}      
                 </Box>                                        
             </Row>
             <Row>

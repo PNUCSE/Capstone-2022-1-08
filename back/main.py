@@ -285,8 +285,9 @@ def relate_data(co):
 def trend(co):
     nm = stc_code_to_nm(co)
     body={
-    "startDate": "2017-01-01",
-    "endDate": "2017-04-30",
+    "startDate":(datetime.today()-timedelta(365)).strftime('%Y-%m-%d'),
+    "endDate": datetime.now().strftime('%Y-%m-%d'),
+    
     "timeUnit": "month",
     "keywordGroups": [
         {
