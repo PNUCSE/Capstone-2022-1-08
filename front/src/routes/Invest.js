@@ -26,30 +26,29 @@ const Row = styled.div`
 function Invest(){
     const code = useRecoilValue(stockCode);
     const fetchInvest = () => {
-    return axios.get(`/api/weather/${code}`);
+        return axios.get(`/api/weather/${code}`);
     }
     const {data,isLoading} = useQuery('invest',fetchInvest);
-
     console.log(data);
     return(
-        <Container>
+        <Container>            
             <Header>기업투자 현황</Header>
+            {isLoading?<div>loading..</div>:<>
             <Row>
                 <Box>
                     <BoxHead>
                          외국인매매 주식
                     </BoxHead>   
                     {data.data.foreign}
-                    <FaCloudRain size={50}/>
+                    {data.data.foreign>0?<FaSun size={50}/>:<FaCloudRain size={50}/>}                 
                 </Box>    
                 <Box>
                     <BoxHead>
                         기관매매 주식
                     </BoxHead>    
                     {data.data.giguan} 
-                    <FaCloudRain size={50}/>     
-                </Box>                   
-                     
+                    {data.data.giguan>0?<FaSun size={50}/>:<FaCloudRain size={50}/>}      
+                </Box>                                        
             </Row>
             <Row>
                 <Box>
@@ -89,6 +88,8 @@ function Invest(){
                 </Box>
                 
             </Row>
+            </>}
+            
             
         </Container>
     )

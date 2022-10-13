@@ -31,7 +31,7 @@ time, mark, audio, video {
   padding: 0;
   border: 0;
   font-size: 100%;
-  font: inherit;
+  font: ${(props)=>props.theme.fontFamily};
   vertical-align: baseline;
 }
 /* HTML5 display-role reset for older browsers */
@@ -47,8 +47,9 @@ body {
   font-weight: 300;
   background-color:${(props) => props.theme.bgColor};
   color:${(props) => props.theme.textColor};
-  font-family:'Source Sans Pro',sans-serif;
+  font-family:${(props)=>props.theme.fontFamily};
   line-height: 1.2;
+  height:100vh;
 }
 *{
   box-sizing:border-box;
