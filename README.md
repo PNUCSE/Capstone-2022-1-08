@@ -36,7 +36,7 @@ Main Page -Search bar
 검색트렌드 차트를 통해 기업의 성장 추이 확인 가능
 
 네이버 금융의 전문가 투자의견 시각화
-![사진4](https://user-images.githubusercontent.com/38302470/**195731725**-df1ba5cf-5c94-46b0-8e6d-70cc85157fe4.png)
+![사진](https://user-images.githubusercontent.com/38302470/195973343-018bd21b-c453-48e5-ac7f-e5cd5dd8a640.png)
 기업의 연결 재무제표 확인 가능
 
 관련 기사를 크롤링하여 기업의 이슈 확인 가능
@@ -48,14 +48,21 @@ Main Page -Search bar
 ## 5. 설치 및 사용법
 
 본 프로젝트는 다음과 같은 패키지가 설치되어 있어야 합니다.
-* tensorflow
+* tensorflow(2.8.0)
 * finance-datareader
 * pandas
 * flask
-* npm
 * beautifulsoup4
 * pykrx
+* matplotlib
+* numpy
+* requests
+* sckit-learn
 
+front 폴더에서 필요모듈을 다운받으세요.
+```
+npm install
+```
 패키지 설치 후,
 ```
 python ./back/main.py
