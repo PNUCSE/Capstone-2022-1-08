@@ -44,7 +44,7 @@ Main Page -Search bar
 기관, 외인 매수/매도 주식 수, PER, PBR등 투자 지표를 활용해 기업의 상황을 일기예보 형식으로 표현
 
 ## 4. 소개 및 시연 연상
-
+https://www.youtube.com/watch?v=6j5uxLUqdxs
 ## 5. 설치 및 사용법
 
 본 프로젝트는 다음과 같은 패키지가 설치되어 있어야 합니다.
